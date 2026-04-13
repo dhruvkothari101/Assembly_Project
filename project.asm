@@ -9,9 +9,9 @@
 		yellow_len equ $ - yellow
 		
 		section .text
-		global _main
+		global main
 		
-		_main:
+		main:
 		mov rbx, 0 ; start with red
 		
 		loop_start:
