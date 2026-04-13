@@ -49,10 +49,17 @@
 		syscall
 		
 		next:
-		inc rbx ; move to next light
+		inc rbx ; move it to the next light
 		
 		cmp rbx, 3
-		jne loop_start
+		je done
 		
-		mov rbx, 0 ; reset back to red
 		jmp loop_start
+		
+
+		
+		done:
+		mov rax, 60
+		xor rdi, rdi
+		syscall
+		
