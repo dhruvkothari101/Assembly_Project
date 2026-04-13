@@ -1,109 +1,58 @@
 	section .data
-		string1 db "Hello", 0
-		string2 times 6 db 0        
-
-		msg_equal db "Strings are equal", 10
-		len_equal equ $ - msg_equal
-
-		msg_not_equal db "Strings are NOT equal", 10
-		len_not_equal equ $ - msg_not_equal
-
-		msg_found db "'o' found in string1", 10
-		len_found equ $ - msg_found
-
-		msg_not_found db "'o' NOT found in string1", 10
-		len_not_found equ $ - msg_not_found
-
-	section .bss
-		buffer resb 1                  
-
+	red db "Red", 10
+	red_len equ $ - red
+	
+	green db "Green", 10
+	green_len equ $ - green
+	
+	yellow db "Yellow", 10
+	yellow_len equ $ - yellow
+	
 	section .text
-		global main
-
-	main:
-		cld                             
-		lea rsi, [rel string1]          
-		lea rdi, [rel string2]          
-
-	copy_loop:
-		lodsb                           
-		stosb                           
-		test al, al                     
-		jnz copy_loop
-
-		lea rsi, [rel string1]
-		lea rdi, [rel string2]
-
-	compare_loop:
-		mov al, [rsi]
-		mov bl, [rdi]
-		cmp al, bl
-		jne not_equal
-		test al, al
-		je equal
-		inc rsi
-		inc rdi
-		jmp compare_loop
-
-	equal:
-		mov rax, 1
-		mov rdi, 1
-		lea rsi, [rel msg_equal]
-		mov rdx, len_equal
-		syscall
-		jmp search_char
-
-	not_equal:
-		mov rax, 1
-		mov rdi, 1
-		lea rsi, [rel msg_not_equal]
-		mov rdx, len_not_equal
-		syscall
-
+	global _start
 	
+	_start:
+	mov rbx, 0 ; start with red
 	
+	loop_start:
 	
-	search_char:
-		lea rdi, [rel string1]
-		mov rcx, 6                      
-		mov al, 'o'
-		cld
-		repne scasb
-		jne char_not_found
-
-	char_found:
-		mov rax, 1
-		mov rdi, 1
-		lea rsi, [rel msg_found]
-		mov rdx, len_found
-		syscall
-		jmp print_string
-
-	char_not_found:
-		mov rax, 1
-		mov rdi, 1
-		lea rsi, [rel msg_not_found]
-		mov rdx, len_not_found
-		syscall
-
+	cmp rbx, 0
+	je print_red
 	
-	print_string:
-		lea rsi, [rel string1]
-		cld
-
-	print_loop:
-		lodsb                           
-		test al, al
-		jz done
-		mov [rel buffer], al
-		mov rax, 1
-		mov rdi, 1
-		lea rsi, [rel buffer]
-		mov rdx, 1
-		syscall
-		jmp print_loop
-
-	done:
-		mov rax, 60                    
-		xor rdi, rdi                   
-		syscall
+	cmp rbx, 1
+	je print_green
+	
+	cmp rbx, 2
+	je print_yellow
+	
+	print_red:
+	mov rax, 1 ; sys_write
+	mov rdi, 1 ; stdout
+	mov rsi, red
+	mov rdx, red_len
+	syscall
+	jmp next
+	
+	print_green:
+	mov rax, 1
+	mov rdi, 1
+	mov rsi, green
+	mov rdx, green_len
+	syscall
+	jmp next
+	
+	print_yellow:
+	mov rax, 1
+	mov rdi, 1
+	mov rsi, yellow
+	mov rdx, yellow_len
+	syscall
+	
+	next:
+	inc rbx ; move to next light
+	
+	cmp rbx, 3
+	jne loop_start
+	
+	mov rbx, 0 ; reset back to red
+	jmp loop_start
